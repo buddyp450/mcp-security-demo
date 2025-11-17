@@ -1,0 +1,16 @@
+{
+  "name": "mcp-demo",
+  "version": "1.0.0",
+  "description": "Unified dev runner for MCP security demo backend/frontend.",
+  "main": "scripts/dev-orchestrator.mjs",
+  "scripts": {
+    "start": "node scripts/dev-orchestrator.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "http-proxy": "^1.18.1"
+  }
+}
