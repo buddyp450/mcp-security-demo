@@ -1,6 +1,5 @@
 **/node_modules
 .cursorrules
 .env
-.venv
 **/dist
 **/__pycache__

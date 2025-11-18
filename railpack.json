@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "packages": {
+    "node": "20",
+    "python": "3.11",
+    "npm": "11.6.0"
+  },
+  "deploy": {
+    "inputs": [
+      {
+        "local": true,
+        "include": ["."]
+      }
+    ],
+    "commands": [
+      "python3 -m pip install --upgrade pip",
+      "python3 -m pip install -r mcp-security-demo/backend/requirements.txt",
+      "cd mcp-security-demo/frontend && npm ci"
+    ],
+    "startCommand": "PYTHON=python3 node scripts/dev-orchestrator.mjs --host 0.0.0.0 --backend-port 8001 --frontend-port 4174 --proxy-port ${PORT}"
+  }
+}
+
