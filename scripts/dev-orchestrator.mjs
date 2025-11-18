@@ -12,9 +12,10 @@ const cliArgs = parseCliArgs(process.argv.slice(2));
 
 const BACKEND_PORT = cliArgs.backendPort ?? process.env.BACKEND_PORT ?? '8001';
 const FRONTEND_PORT = cliArgs.frontendPort ?? process.env.FRONTEND_PORT ?? '5174';
-const PROXY_PORT = cliArgs.proxyPort ?? process.env.PROXY_PORT ?? '5173';
-const DEV_HOST = cliArgs.host ?? process.env.HOST ?? '127.0.0.1';
-const TARGET_HOST = DEV_HOST === '0.0.0.0' ? '127.0.0.1' : DEV_HOST;
+const PROXY_PORT = cliArgs.proxyPort ?? process.env.PORT ?? process.env.PROXY_PORT ?? '5173';
+const CHILD_HOST = cliArgs.childHost ?? process.env.CHILD_HOST ?? process.env.HOST ?? '127.0.0.1';
+const PROXY_HOST = cliArgs.proxyHost ?? process.env.PROXY_HOST ?? '0.0.0.0';
+const TARGET_HOST = CHILD_HOST === '0.0.0.0' ? '127.0.0.1' : CHILD_HOST;
 
 const projectDir = path.join(ROOT, 'mcp-security-demo');
 const backendDir = path.join(projectDir, 'backend');
@@ -77,12 +78,13 @@ function shutdown(code = 0) {
 
 console.log(`[orchestrator] backend python: ${resolvedPython.display}`);
 console.log(`[orchestrator] frontend npm: ${resolvedNpm.display}`);
+console.log(`[orchestrator] child services bind ${CHILD_HOST}, proxy on ${PROXY_HOST}:${PROXY_PORT}`);
 
-spawnProcess(pythonCmd, [...pythonPreArgs, '-m', 'uvicorn', 'backend.main:app', '--host', DEV_HOST, '--port', BACKEND_PORT, '--reload'], {
+spawnProcess(pythonCmd, [...pythonPreArgs, '-m', 'uvicorn', 'backend.main:app', '--host', CHILD_HOST, '--port', BACKEND_PORT, '--reload'], {
   cwd: projectDir,
 });
 
-spawnProcess(npmCmd, [...npmPreArgs, 'run', 'dev', '--', '--host', DEV_HOST, '--port', FRONTEND_PORT], {
+spawnProcess(npmCmd, [...npmPreArgs, 'run', 'dev', '--', '--host', CHILD_HOST, '--port', FRONTEND_PORT], {
   cwd: frontendDir,
 });
 
@@ -128,8 +130,9 @@ server.on('upgrade', (req, socket, head) => {
   );
 });
 
-server.listen(PROXY_PORT, () => {
-  console.log(`[proxy] listening on http://localhost:${PROXY_PORT}`);
+server.listen(PROXY_PORT, PROXY_HOST, () => {
+  const hostLabel = PROXY_HOST === '0.0.0.0' ? 'localhost' : PROXY_HOST;
+  console.log(`[proxy] listening on http://${hostLabel}:${PROXY_PORT}`);
   console.log(`[proxy] /api and /ws -> backend:${BACKEND_PORT}`);
   console.log(`[proxy] static + HMR -> frontend:${FRONTEND_PORT}`);
 });
