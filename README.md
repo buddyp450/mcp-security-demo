@@ -1,5 +1,7 @@
 # Trust is earned, not given
 
+# [DEMO Site](https://mcp-security-demo.onrender.com/)
+
 This repo hosts the MCP Security Demo showcased in the `mcp-security-demo/` subdirectory.  
 It simulates hostile MCP servers (tool providers) and progressively hardened clients to
 illustrate how registry checks, runtime monitoring, and sandboxing can contain covert data
